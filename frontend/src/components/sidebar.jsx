@@ -52,12 +52,14 @@ const Sidebar = () => {
           </NavLink>
         </li>
         <li>
-          <a href="#" className="nav-link text-white">
+         
+          <NavLink to="/Addstudent" className="nav-link text-white">
             <svg className="bi me-2" width="16" height="16">
-              <use xlink:href="#grid"></use>
+              <use xlink:href="#table"></use>
             </svg>
-            Products
-          </a>
+            Addstudent
+          </NavLink>
+          
         </li>
         <li>
           <a href="#" className="nav-link text-white">

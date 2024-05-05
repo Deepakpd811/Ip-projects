@@ -59,7 +59,7 @@ const upload = multer({ storage: storage });
 
 // Function to save face descriptor to database
 
-async function saveFaceDescriptor(userId, photoPath) {
+async function saveFaceDescriptor(userName,userId, photoPath) {
   try {
     // Load the user's photo from the specified path using canvas
     const img = await loadImage(photoPath);
@@ -78,7 +78,7 @@ async function saveFaceDescriptor(userId, photoPath) {
     const faceDescriptor = detection.descriptor;
 
     // Save the face descriptor along with the user ID in the database
-    await Attendance.create({ studentId: userId, features: faceDescriptor });
+    await Attendance.create({ name:userName, studentId: userId, features: faceDescriptor });
 
     console.log("Face descriptor saved successfully.");
   } catch (error) {
@@ -95,14 +95,16 @@ app.post("/upload", upload.single("photo"), async (req, res) => {
   }
 
   // File uploaded successfully
-  const {userName,userId} = req.body;
+  const {name,rollNumber} = req.body;
    // Assuming userId is sent along with the photo
   const photoPath = req.file.path;
-  console.log(userName);
-  console.log(userId);
+
+  // console.log(name);
+  // console.log(rollNumber);
+  // console.log(image);n
 
   // Call function to save face descriptor to database
-  await saveFaceDescriptor(userId, photoPath);
+  await saveFaceDescriptor(name,rollNumber, photoPath);
 
   res.status(200).send("File uploaded successfully.");
 });
@@ -186,15 +188,12 @@ app.post("/check-face",async (req, res) => {
   // Format the time as HH:MM:SS
   const formattedTime = `${hours}:${minutes}:${seconds}`;
 
+
   console.log("checking face at " + formattedTime )
-
-
-  
   result = await getDescriptorsFromDB(req.body.image);
-  // console.log(result);
-  res.json({ msg: result?result[0]:"no data" });
-
-  
+  // console.log(result[0]);
+  // console.log(typeof(result));
+  res.json({ msg: result[0] === undefined ? {_label: "no data"} : result[0]});
 });
 
 
