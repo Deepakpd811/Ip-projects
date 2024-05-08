@@ -1,49 +1,50 @@
 import axios from "axios"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 const Dashboard = ()=>{
 
+  const [studata,Setstudata] = useState([{}]);
   useEffect(()=>{
     axios
-              .get("http://localhost:3000/student")
-              .then((response) => {
-                console.log("Recognition result:", response);
-                setRoll(response.data.msg._label);
-              })
-              .catch((error) => {
-                console.error("Error sending image to server:", error);
-              });
+    .get("http://localhost:3000/dash")
+    .then((response) => {
+      // console.log("Recognition result:", response.data.marked);
+      Setstudata(response.data.marked);
+      
+    })
+    .catch((error) => {
+      console.error("Error sending image to server:", error);
+    });
   },[])
-    return(
-        <>
+  // console.log(studata[0]);
+  return(
+    <>
         
         <table className="table">
   <thead>
     <tr>
       <th scope="col">#</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th scope="col">Handle</th>
+      <th scope="col">id</th>
+      <th scope="col">marked</th>
+      <th scope="col">Date</th>
     </tr>
   </thead>
   <tbody>
-    <tr>
+  {studata.map((stu, index) => (
+    <tr key={index}>
+        <th scope="row">{index + 1}</th>
+        <td>{stu.id}</td>
+        <td>{stu.marked}</td>
+        <td>{stu.date}</td>
+    </tr>
+))}
+    {/* <tr>
       <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
+      <td>{studata[0].id}</td>
+      <td>{studata[0].marked}</td>
+      <td>{studata[0].date}</td>
     </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
-    </tr>
+     */}
   </tbody>
         </table>
 

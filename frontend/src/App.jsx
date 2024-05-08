@@ -11,10 +11,10 @@ function App() {
       <div className="d-flex">
         <Sidebar />
         <div className="content">
-          <Navbar />
+          {/* <Navbar /> */}
           <Outlet />
-
           <Footer />
+          
         </div>
       </div>
     </>

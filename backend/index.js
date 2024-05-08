@@ -43,7 +43,18 @@ const attendanceSchema = new mongoose.Schema({
   features: String,
   timestamp: { type: Date, default: Date.now },
 });
+
+const attendanceMarkedSchema = new mongoose.Schema({
+  id: String,
+  marked:String,
+  date: { type: Date, default: Date.now }
+});
+
+const AttendanceMarked = mongoose.model('AttendanceMarked', attendanceMarkedSchema);
+
+
 const Attendance = mongoose.model("Attendance", attendanceSchema);
+// const attendanceMarked = mongoose.model("AttendenceMarked", attendanceMarkedSchema);
 
 // Set up multer to handle file uploads
 const storage = multer.diskStorage({
@@ -110,10 +121,6 @@ app.post("/upload", upload.single("photo"), async (req, res) => {
 });
 
 
-
-
-
-
 async function getDescriptorsFromDB(imagePath) {
   try {
     // Load the image from the specified path using canvas
@@ -140,9 +147,6 @@ async function getDescriptorsFromDB(imagePath) {
       throw new Error("No face detected in the uploaded photo.");
     }
 
-
-
-
     // Find matching faces
     const results = detections.map(detection => faceMatcher.findBestMatch(detection.descriptor));
 
@@ -153,26 +157,6 @@ async function getDescriptorsFromDB(imagePath) {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-// app.post("/check-face",upload.single("check") ,async (req, res) => {
-
-//   const photoPath = req.file.path;
-
-//   let result = await getDescriptorsFromDB(photoPath);
-//   console.log(result);
-//   res.json({ result });
-  
-// });
 
 app.post("/check-face",async (req, res) => {
 
@@ -191,12 +175,45 @@ app.post("/check-face",async (req, res) => {
 
   console.log("checking face at " + formattedTime )
   result = await getDescriptorsFromDB(req.body.image);
-  // console.log(result[0]);
+  console.log("done");
   // console.log(typeof(result));
   res.json({ msg: result[0] === undefined ? {_label: "no data"} : result[0]});
 });
 
 
+app.get('/roll/:id',async (req,res)=>{
+    let id = req.params.id;
+    console.log(id)
+   
+
+
+
+    
+
+    if(id!=="no data" && id!=="unknown"){
+      let marked = await AttendanceMarked.find({id});
+      // console.log(marked)
+
+      if(marked.length !=0) return res.json({msg:"alredy marked"})
+
+      await AttendanceMarked.create({
+        id:id,
+        marked: "present",
+      })
+
+    }
+
+    res.json({msg:"Attendence Marked "});
+  })
+  
+  app.get('/dash',async (req,res)=>{
+    let marked = await AttendanceMarked.find();
+    console.log(marked)
+    
+    res.json({msg:"done", marked:marked});
+
+  console.log(marked)
+})
 
 
 

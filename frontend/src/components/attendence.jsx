@@ -2,15 +2,27 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 function Attendance() {
-  const [roll, setRoll] = useState({});
+  const [recognitionResult, setRecognitionResult] = useState({});
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
+  const sendRoll = (roll) => {
+    if (roll._label !== "no date" && roll._label !== "unknown" && roll !== null) {
+      console.log("Sending recognition result to server");
+      axios.get(`http://localhost:3000/roll/${roll}`)
+        .then((response) => {
+          console.log("Recognition result:", response.data.msg);
+        })
+        .catch((error) => {
+          console.error("Error sending recognition result to server:", error);
+        });
+    }
+  };
+
   const capture = () => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true })
+    navigator.mediaDevices.getUserMedia({ video: true })
       .then((stream) => {
-        streamRef.current = stream; // Save the stream reference
+        streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
@@ -29,11 +41,10 @@ function Attendance() {
 
     const dataUrl = canvas.toDataURL("image/jpeg");
 
-    axios
-      .post("http://localhost:3000/check-face", { image: dataUrl })
+    axios.post("http://localhost:3000/check-face", { image: dataUrl })
       .then((response) => {
         console.log("Recognition result:", response.data.msg);
-        setRoll(response.data.msg);
+        setRecognitionResult(response.data.msg);
       })
       .catch((error) => {
         console.error("Error sending image to server:", error);
@@ -41,17 +52,20 @@ function Attendance() {
   };
 
   useEffect(() => {
-    capture(); // Start capturing when component mounts
+    capture();
 
     return () => {
-      // Clean up the video stream when component unmounts
-      
       if (streamRef.current) {
-        // Stop the camera stream if it exists
         streamRef.current.getTracks().forEach(track => track.stop());
       }
     };
-  }, []); // Empty dependency array to run only once when component mounts
+  }, []);
+
+  useEffect(() => {
+    if (Object.keys(recognitionResult).length !== 0) {
+      sendRoll(recognitionResult._label);
+    }
+  }, [recognitionResult]);
 
   const stopCapture = () => {
     if (videoRef.current && videoRef.current.srcObject) {
@@ -61,14 +75,8 @@ function Attendance() {
 
   return (
     <div>
-      <video
-        id="video"
-        width="640"
-        height="480"
-        autoPlay
-        ref={videoRef}
-      ></video>
-      <h1 id="roll">{roll._label}</h1>
+      <video id="video" width="640" height="480" autoPlay ref={videoRef}></video>
+      <h1 id="roll">{recognitionResult._label}</h1>
       <button onClick={stopCapture}>Stop</button>
       <button onClick={captureImage}>Capture Image</button>
     </div>
