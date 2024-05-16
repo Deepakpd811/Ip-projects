@@ -9,6 +9,7 @@ import Dashboard from "./components/dashbord.jsx";
 import Home from "./components/home.jsx";
 import Attendence from "./components/attendence.jsx";
 import Addstudent from "./components/Addstudent.jsx";
+import All_student from "./components/All_student.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -17,6 +18,7 @@ const router = createBrowserRouter(
       <Route path="Dashboard" element={<Dashboard/>}></Route>
       <Route path="Attendence" element={<Attendence/>}></Route>
       <Route path="Addstudent" element={<Addstudent/>}></Route>
+      <Route path="Allstudent" element={<All_student/>}></Route>
     </Route>
   )
 )

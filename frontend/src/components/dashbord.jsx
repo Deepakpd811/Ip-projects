@@ -1,55 +1,72 @@
-import axios from "axios"
-import { useEffect, useState } from "react"
+import axios from "axios";
+import { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; 
 
-const Dashboard = ()=>{
+const Dashboard = () => {
+  const [studata, Setstudata] = useState([]); 
+  const [selectedDate, setSelectedDate] = useState(new Date()); 
 
-  const [studata,Setstudata] = useState([{}]);
-  useEffect(()=>{
-    axios
-    .get("http://localhost:3000/dash")
-    .then((response) => {
-      // console.log("Recognition result:", response.data.marked);
-      Setstudata(response.data.marked);
-      
-    })
-    .catch((error) => {
-      console.error("Error sending image to server:", error);
-    });
-  },[])
-  // console.log(studata[0]);
-  return(
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/dash");
+        Setstudata(response.data.marked);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
+
+  const filteredData = studata.filter((student) => {
+    const studentDate = new Date(student.date);
+    return studentDate.getFullYear() === selectedDate.getFullYear() &&
+      studentDate.getMonth() === selectedDate.getMonth() &&
+      studentDate.getDate() === selectedDate.getDate();
+  });
+
+  return (
     <>
-        
-        <table className="table">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">id</th>
-      <th scope="col">marked</th>
-      <th scope="col">Date</th>
-    </tr>
-  </thead>
-  <tbody>
-  {studata.map((stu, index) => (
-    <tr key={index}>
-        <th scope="row">{index + 1}</th>
-        <td>{stu.id}</td>
-        <td>{stu.marked}</td>
-        <td>{stu.date}</td>
-    </tr>
-))}
-    {/* <tr>
-      <th scope="row">1</th>
-      <td>{studata[0].id}</td>
-      <td>{studata[0].marked}</td>
-      <td>{studata[0].date}</td>
-    </tr>
-     */}
-  </tbody>
-        </table>
+      <div className="d-flex justify-content-end mb-2 py-3">
+        <p>Filter</p>
+        <div className="mx-5">
 
-        </>
-    )
-}
+        <DatePicker selected={selectedDate} onChange={handleDateChange} />
+        </div>
+      </div>
+      <table className="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">id</th>
+            <th scope="col">marked</th>
+            <th scope="col">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredData.map((stu, index) => (
+            <tr key={index}>
+              <th scope="row">{index + 1}</th>
+              <td>{stu.id}</td>
+              <td>{stu.marked}</td>
+              <td>{stu.date}</td>
+            </tr>
+          ))}
+          {filteredData.length === 0 && (
+            <tr>
+              <td colSpan="4">No data found for selected date.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </>
+  );
+};
 
-export default Dashboard
+export default Dashboard;

@@ -17,44 +17,15 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const { Canvas, Image, loadImage } = require("canvas");
 faceapi.env.monkeyPatch({ Canvas, Image });
+const {Attendance,AttendanceMarked} = require('./db')
 
-const mongoose = require("mongoose");
 
 const app = express();
 app.use(cors());
 app.use(express.static("uploads"));
 app.use(bodyParser.json());
 
-// Connect to MongoDB
-mongoose.connect("mongodb://localhost:27017/attendance", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "MongoDB connection error:"));
-db.once("open", () => {
-  console.log("Connected to MongoDB");
-});
 
-// Define schema for attendance records
-const attendanceSchema = new mongoose.Schema({
-  name:String,
-  studentId: String,
-  features: String,
-  timestamp: { type: Date, default: Date.now },
-});
-
-const attendanceMarkedSchema = new mongoose.Schema({
-  id: String,
-  marked:String,
-  date: { type: Date, default: Date.now }
-});
-
-const AttendanceMarked = mongoose.model('AttendanceMarked', attendanceMarkedSchema);
-
-
-const Attendance = mongoose.model("Attendance", attendanceSchema);
-// const attendanceMarked = mongoose.model("AttendenceMarked", attendanceMarkedSchema);
 
 // Set up multer to handle file uploads
 const storage = multer.diskStorage({
@@ -97,30 +68,6 @@ async function saveFaceDescriptor(userName,userId, photoPath) {
   }
 }
 
-
-// Route to handle file upload
-app.post("/upload", upload.single("photo"), async (req, res) => {
-  // Check if file was uploaded
-  if (!req.file) {
-    return res.status(400).send("No file uploaded.");
-  }
-
-  // File uploaded successfully
-  const {name,rollNumber} = req.body;
-   // Assuming userId is sent along with the photo
-  const photoPath = req.file.path;
-
-  // console.log(name);
-  // console.log(rollNumber);
-  // console.log(image);n
-
-  // Call function to save face descriptor to database
-  await saveFaceDescriptor(name,rollNumber, photoPath);
-
-  res.status(200).send("File uploaded successfully.");
-});
-
-
 async function getDescriptorsFromDB(imagePath) {
   try {
     // Load the image from the specified path using canvas
@@ -157,6 +104,27 @@ async function getDescriptorsFromDB(imagePath) {
   }
 }
 
+// Route to handle file upload
+app.post("/upload", upload.single("photo"), async (req, res) => {
+  // Check if file was uploaded
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
+
+  // File uploaded successfully
+  const {name,rollNumber} = req.body;
+   // Assuming userId is sent along with the photo
+  const photoPath = req.file.path;
+
+  // console.log(name);
+  // console.log(rollNumber);
+  // console.log(image);n
+
+  // Call function to save face descriptor to database
+  await saveFaceDescriptor(name,rollNumber, photoPath);
+
+  res.status(200).send("File uploaded successfully.");
+});
 
 app.post("/check-face",async (req, res) => {
 
@@ -180,19 +148,27 @@ app.post("/check-face",async (req, res) => {
   res.json({ msg: result[0] === undefined ? {_label: "no data"} : result[0]});
 });
 
-
 app.get('/roll/:id',async (req,res)=>{
     let id = req.params.id;
-    console.log(id)
-   
 
-
-
-    
-
+  
     if(id!=="no data" && id!=="unknown"){
-      let marked = await AttendanceMarked.find({id});
-      // console.log(marked)
+
+      const today = new Date(); // Get today's date
+      let marked = [];
+      await AttendanceMarked.find({
+        id: id, 
+        date: { $gte: today.setHours(0, 0, 0, 0) } 
+      })
+      .then(attendance => {
+       
+        marked = attendance;
+        console.log(attendance); 
+      })
+      .catch(error => {
+        console.error(error);
+      });
+      // console.log("--->"+marked)
 
       if(marked.length !=0) return res.json({msg:"alredy marked"})
 
@@ -206,19 +182,15 @@ app.get('/roll/:id',async (req,res)=>{
     res.json({msg:"Attendence Marked "});
   })
   
-  app.get('/dash',async (req,res)=>{
+app.get('/dash',async (req,res)=>{
     let marked = await AttendanceMarked.find();
-    console.log(marked)
-    
     res.json({msg:"done", marked:marked});
-
-  console.log(marked)
 })
 
-
-
-
-
+app.get('/studentDetail',async (req,res)=>{
+    let marked = await Attendance.find({}, { name: 1, _id: 1 ,studentId:1});   
+    res.json({msg:"done", marked:marked});
+})
 
 
 // Start the server

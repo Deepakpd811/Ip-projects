@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Attendance() {
   const [recognitionResult, setRecognitionResult] = useState({});
@@ -12,9 +14,11 @@ function Attendance() {
       axios.get(`http://localhost:3000/roll/${roll}`)
         .then((response) => {
           console.log("Recognition result:", response.data.msg);
+          toast.success(response.data.msg); // Show success toast
         })
         .catch((error) => {
           console.error("Error sending recognition result to server:", error);
+          toast.error("Error marking attendance!"); // Show error toast
         });
     }
   };
@@ -75,6 +79,7 @@ function Attendance() {
 
   return (
     <div>
+      <ToastContainer /> {/* Add ToastContainer outside the return */}
       <video id="video" width="640" height="480" autoPlay ref={videoRef}></video>
       <h1 id="roll">{recognitionResult._label}</h1>
       <button onClick={stopCapture}>Stop</button>
