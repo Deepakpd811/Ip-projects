@@ -13,7 +13,7 @@ function App() {
         <div className="content">
           {/* <Navbar /> */}
           <Outlet />
-          <Footer />
+          {/* <Footer /> */}
           
         </div>
       </div>

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { FaPlay,FaStop } from "react-icons/fa";
+import "./home.css"
 
 function Attendance() {
   const [recognitionResult, setRecognitionResult] = useState({});
@@ -78,13 +80,20 @@ function Attendance() {
   };
 
   return (
-    <div>
-      <ToastContainer /> {/* Add ToastContainer outside the return */}
-      <video id="video" width="640" height="480" autoPlay ref={videoRef}></video>
+    <>
+  
+      <ToastContainer />
+    <div className='box'>
+        <h1>Attendance</h1>
+      <video className='vedio' id="video" width="640" height="480" autoPlay ref={videoRef}></video>
       <h1 id="roll">{recognitionResult._label}</h1>
-      <button onClick={stopCapture}>Stop</button>
-      <button onClick={captureImage}>Capture Image</button>
+      <div>
+      <button className='btn btn-danger mx-5  pb-2' onClick={stopCapture}><FaStop/></button>
+      <button className='btn btn-success pb-2' onClick={captureImage}><FaPlay/></button>
+
+      </div>
     </div>
+    </>
   );
 }
 

@@ -40,7 +40,7 @@ const Dashboard = () => {
         <DatePicker selected={selectedDate} onChange={handleDateChange} />
         </div>
       </div>
-      <table className="table">
+      <table className="table table-striped table-hover ">
         <thead>
           <tr>
             <th scope="col">#</th>

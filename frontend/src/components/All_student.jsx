@@ -46,10 +46,10 @@ const  All_student= ()=>{
         return(
           <>
                
-              <table className="table">
-        <thead>
+              <table className="table table-striped">
+        <thead className='thead-dark'>
           <tr>
-            <th scope="col">#</th>
+            <th scope="col" >#</th>
             <th scope="col">id</th>
             <th scope="col">name</th>
             <th scope="col">Action</th>
