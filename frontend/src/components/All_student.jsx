@@ -1,5 +1,7 @@
 import React from 'react'
 import axios from "axios"
+// import { MdDeleteOutline } from "react-icons/ti";
+import { MdCancel } from "react-icons/md";
 import { useEffect, useState } from "react"
 
 
@@ -43,7 +45,7 @@ const  All_student= ()=>{
 
         return(
           <>
-              
+               
               <table className="table">
         <thead>
           <tr>
@@ -60,8 +62,8 @@ const  All_student= ()=>{
               <td>{stu.studentId}</td>
               <td>{stu.name}</td>
               <td>
-                  <button onClick={() => handleDeleteStudent(stu._id)}>
-                    Delete
+                  <button className='btn btn-danger' onClick={() => handleDeleteStudent(stu._id)}>
+                  Delete 
                   </button>
                 </td>
           </tr>
