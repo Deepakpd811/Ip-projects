@@ -11,7 +11,7 @@ function Attendance() {
   const sendRoll = (roll) => {
     if (roll._label !== "no date" && roll._label !== "unknown" && roll !== null) {
       console.log("Sending recognition result to server");
-      axios.get(`http://localhost:3000/roll/${roll}`)
+      axios.get(`http://localhost:3000/attendance/roll/${roll}`)
         .then((response) => {
           console.log("Recognition result:", response.data.msg);
           toast.success(response.data.msg); // Show success toast
@@ -45,7 +45,7 @@ function Attendance() {
 
     const dataUrl = canvas.toDataURL("image/jpeg");
 
-    axios.post("http://localhost:3000/check-face", { image: dataUrl })
+    axios.post("http://localhost:3000/faces/check-face", { image: dataUrl })
       .then((response) => {
         console.log("Recognition result:", response.data.msg);
         setRecognitionResult(response.data.msg);

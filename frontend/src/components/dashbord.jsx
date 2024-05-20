@@ -10,7 +10,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/dash");
+        const response = await axios.get("http://localhost:3000/attendance/dash");
         Setstudata(response.data.marked);
       } catch (error) {
         console.error("Error fetching data:", error);

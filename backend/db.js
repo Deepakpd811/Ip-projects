@@ -12,7 +12,7 @@ db.once("open", () => {
 });
 
 // Define schema for attendance records
-const attendanceSchema = new mongoose.Schema({
+const student = new mongoose.Schema({
   name:String,
   studentId: String,
   features: String,
@@ -20,12 +20,28 @@ const attendanceSchema = new mongoose.Schema({
 });
 
 const attendanceMarkedSchema = new mongoose.Schema({
-  id: String,
-  marked:String,
-  date: { type: Date, default: Date.now }
+  student: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Student',
+    required: true, // Ensure a student reference is provided
+  },
+  status: {
+    type: String,
+    enum: ['Present', 'Absent', 'Excused', 'Late'],
+  },
+  date: { type: Date, default: Date.now },
 });
 
-const AttendanceMarked = mongoose.model('AttendanceMarked', attendanceMarkedSchema);
-const Attendance = mongoose.model("Attendance", attendanceSchema);
+attendanceMarkedSchema.pre('save', function(next) {
+  if (!this.status) { // Check if status is not set
+    this.status = 'Absent';
+  }
+  next();
+});
 
-module.exports = {AttendanceMarked,Attendance}
+
+
+const AttendanceMarked = mongoose.model('AttendanceMarked', attendanceMarkedSchema);
+const Student = mongoose.model("Attendance", student);
+
+module.exports = {AttendanceMarked,Student}

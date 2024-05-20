@@ -8,9 +8,10 @@ const  All_student= ()=>{
         const [studata,Setstudata] = useState([{}]);
         useEffect(()=>{
           axios
-          .get("http://localhost:3000/studentDetail")
+          .get("http://localhost:3000/students/studentDetail")
           .then((response) => {
             // console.log("Recognition result:", response.data.marked);
+            console.log(response.data.marked)
             Setstudata(response.data.marked);
             
           })
@@ -19,6 +20,27 @@ const  All_student= ()=>{
           });
         },[])
         // console.log(studata[0]);
+
+        const handleDeleteStudent = async (studentId) => {
+          if (!window.confirm('Are you sure you want to delete this student?')) {
+            return; // User canceled deletion
+          }
+      
+          try {
+            const response = await axios.delete(`http://localhost:3000/students/studentDel/${studentId}`); // Assuming DELETE endpoint with student ID
+      
+            // Update local state if deletion is successful on the server
+            Setstudata(studata.filter((student) => student._id !== studentId)); // Use student ID for filtering (assuming _id is unique)
+          } catch (error) {
+            console.error('Error deleting student:', error);
+            setError('An error occurred while deleting the student. Please try again later.');
+          }
+          // alert(studentId)
+        };
+
+
+
+
         return(
           <>
               
@@ -28,7 +50,7 @@ const  All_student= ()=>{
             <th scope="col">#</th>
             <th scope="col">id</th>
             <th scope="col">name</th>
-            <th scope="col">Date</th>
+            <th scope="col">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -37,7 +59,11 @@ const  All_student= ()=>{
               <th scope="row">{index + 1}</th>
               <td>{stu.studentId}</td>
               <td>{stu.name}</td>
-              <td>{stu.date}</td>
+              <td>
+                  <button onClick={() => handleDeleteStudent(stu._id)}>
+                    Delete
+                  </button>
+                </td>
           </tr>
       ))}
           {/* <tr>

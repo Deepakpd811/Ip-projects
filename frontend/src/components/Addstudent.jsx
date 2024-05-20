@@ -38,7 +38,7 @@ function Addstudent() {
     formData.append('photo', image);
 
     try {
-      const response = await axios.post('http://localhost:3000/upload', formData, {
+      const response = await axios.post('http://localhost:3000/faces/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
