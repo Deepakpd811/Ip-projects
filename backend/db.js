@@ -20,15 +20,8 @@ const student = new mongoose.Schema({
 });
 
 const attendanceMarkedSchema = new mongoose.Schema({
-  student: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Student',
-    required: true, // Ensure a student reference is provided
-  },
-  status: {
-    type: String,
-    enum: ['Present', 'Absent', 'Excused', 'Late'],
-  },
+  id:String,
+  marked:String,
   date: { type: Date, default: Date.now },
 });
 
@@ -41,7 +34,7 @@ attendanceMarkedSchema.pre('save', function(next) {
 
 
 
-const AttendanceMarked = mongoose.model('AttendanceMarked', attendanceMarkedSchema);
+const AttendanceMarked = mongoose.model('AttendanceMarkeds', attendanceMarkedSchema);
 const Student = mongoose.model("Attendance", student);
 
 module.exports = {AttendanceMarked,Student}
